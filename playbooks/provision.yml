@@ -1,0 +1,56 @@
+---
+- hosts: gluster
+  become: yes
+
+  vars_files:
+    - vars.yml
+
+  roles:
+    - geerlingguy.glusterfs
+
+  tasks:
+    #- name: Set firewall rules
+    #  iptables:
+    #    chain: GLUSTER
+    #    ctstate: NEW
+    #    destination_port: 24007
+    #      #  - 24007
+    #      #  - 24008
+    #      #  - 24009
+    #      #  - 38465
+    #      #  - 38466
+    #      #  - 38467
+    #      #  - 38468
+    #      #  - 38469
+    #    protocol: tcp
+    #    match: tcp
+    #    jump: ACCEPT
+      #firewalld:
+      #  service: glusterfs
+      #  permanent: true
+      #  state: enabled
+
+    - name: Ensure Gluster brick and mount directories exist.
+      file: "path={{ item }} state=directory mode=0775"
+      with_items:
+        - "{{ gluster_brick_dir }}"
+        - "{{ gluster_mount_dir }}"
+
+    - name: Configure Gluster volume.
+      gluster_volume:
+        state: present
+        name: "{{ gluster_brick_name }}"
+        brick: "{{ gluster_brick_dir }}"
+        replicas: 3
+        cluster: "{{ groups.gluster | join(',') }}"
+        host: "{{ inventory_hostname }}"
+        force: yes
+      run_once: true
+
+    - name: Ensure Gluster volume is mounted.
+      mount:
+        name: "{{ gluster_mount_dir }}"
+        src: "{{ inventory_hostname }}:/{{ gluster_brick_name }}"
+        fstype: glusterfs
+        opts: "defaults,_netdev"
+        state: mounted

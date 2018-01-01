@@ -1,0 +1,18 @@
+kind: Endpoints
+apiVersion: v1
+metadata:
+  name: gluster-service
+  #namespace: preprod
+subsets:
+  - addresses:
+      - ip: 10.10.10.196
+    ports:
+      - port: 1
+  - addresses:
+      - ip: 10.10.10.197
+    ports:
+      - port: 1
+  - addresses:
+      - ip: 10.10.10.198
+    ports:
+      - port: 1

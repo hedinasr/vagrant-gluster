@@ -1,0 +1,5 @@
+---
+# Gluster configuration.
+gluster_mount_dir: /var/log/test-gfs # correspond au point de montage
+gluster_brick_dir: /data/test-gfs # correspond au disque phy
+gluster_brick_name: test
